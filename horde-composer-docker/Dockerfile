@@ -8,6 +8,7 @@ RUN ["git", "clone", "https://github.com/maintaina-com/horde-deployment", "/srv/
 
 WORKDIR /srv/www/horde
 
+# NOTE: when running this locally, a Github Api Token is required
 RUN ["composer", "install", "-n"]
 
 CMD ["/bin/bash"]
