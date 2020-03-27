@@ -3,7 +3,8 @@ name: Docker Image for Horde Composer deployment
 on:
   push:
     paths:
-      - horde-composer-docker
+    - horde-composer-docker/*
+
     # Publish `master` as Docker `latest` image.
     branches:
       - master
