@@ -1,10 +1,7 @@
-name: Docker Image for Horde Composer deployment
+name: Horde Composer Container Image
 
 on:
   push:
-    paths:
-      - horde-composer-docker/*
-
     # Publish `master` as Docker `latest` image.
     branches:
       - master
@@ -29,7 +26,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Run tests
-        working-directory: horde-composer-docker
         run: |
           docker build . --file Dockerfile
 
@@ -46,7 +42,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        working-directory: horde-composer-docker
         run: docker build . --file Dockerfile --tag image
 
       - name: Log into registry
