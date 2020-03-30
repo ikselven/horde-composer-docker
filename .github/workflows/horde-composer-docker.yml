@@ -18,17 +18,20 @@ env:
 
 jobs:
   test:
-    - name: Get latest tag
-      id: latest_tag
-      uses: jacobtomlinson/gha-get-docker-hub-tags@0.1.3
-      with:
-        org: 'opensuse'  # Docker Hub user or organisation name
-        repo: 'tumbleweed'  # Docker Hub repository name
+    runs-on: ubuntu-latest
 
-    # Optionally check the tag we got back
-    - name: Check outputs
-      run: |
-        echo "Latest Image Tag - ${{ steps.latest_tag.outputs }}"
+    steps:
+      - name: Get latest tag
+        id: latest_tag
+        uses: jacobtomlinson/gha-get-docker-hub-tags@0.1.3
+        with:
+          org: 'opensuse'  # Docker Hub user or organisation name
+          repo: 'tumbleweed'  # Docker Hub repository name
+
+      # Optionally check the tag we got back
+      - name: Check outputs
+        run: |
+          echo "Latest Image Tag - ${{ steps.latest_tag.outputs }}"
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   #test:
