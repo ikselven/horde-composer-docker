@@ -68,3 +68,11 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+
+      - name: Trigger rebuild of horde-apache
+        uses: mvasigh/dispatch-action@master
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repo: ikselven/horde-apache
+          owner: ikselven
+          event_type: horde-composer-docker-updated
