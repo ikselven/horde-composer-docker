@@ -13,25 +13,13 @@ on:
   # Run tests for any PRs.
   pull_request:
 
+  schedule:
+    - cron: '20 16 * * *'
+
 env:
   IMAGE_NAME: horde-composer-docker
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Get latest tag
-        id: latest_tag
-        uses: jacobtomlinson/gha-get-docker-hub-tags@0.1.3
-        with:
-          org: 'opensuse'  # Docker Hub user or organisation name
-          repo: 'tumbleweed'  # Docker Hub repository name
-
-      # Optionally check the tag we got back
-      - name: Check outputs
-        run: |
-          echo "Latest Image Tag - ${{ steps.latest_tag.outputs }}"
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   #test:
@@ -46,47 +34,47 @@ jobs:
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
-  #push:
-  #  # Ensure test job passes before pushing image.
-  #  #needs: test
+  push:
+    # Ensure test job passes before pushing image.
+    #needs: test
 
-  #  runs-on: ubuntu-latest
-  #  if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'schedule'
 
-  #  steps:
-  #    - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-  #    - name: Build image
-  #      run: docker build . --file Dockerfile --tag image
+      - name: Build image
+        run: docker build . --file Dockerfile --tag image
 
-  #    - name: Log into registry
-  #      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-  #    - name: Push image
-  #      run: |
-  #        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
 
-  #        # Change all uppercase to lowercase
-  #        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-  #        # Strip git ref prefix from version
-  #        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
-  #        # Strip "v" prefix from tag name
-  #        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-  #        # Use Docker `latest` tag convention
-  #        [ "$VERSION" == "master" ] && VERSION=latest
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
 
-  #        echo IMAGE_ID=$IMAGE_ID
-  #        echo VERSION=$VERSION
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
 
-  #        docker tag image $IMAGE_ID:$VERSION
-  #        docker push $IMAGE_ID:$VERSION
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
 
-  #    - name: Trigger rebuild of horde-apache
-  #      uses: peter-evans/repository-dispatch@v1
-  #      with:
-  #        token: ${{ secrets.REPO_ACCESS_TOKEN }}
-  #        repository: ikselven/horde-apache
-  #        event-type: horde-composer-docker-updated
+      - name: Trigger rebuild of horde-apache
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: ikselven/horde-apache
+          event-type: horde-composer-docker-updated
