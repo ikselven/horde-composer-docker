@@ -21,4 +21,4 @@ You may need to be logged into the Github Docker Registry to pull the image, eve
 
 ## Further information
 
-See [ikselven/horde-apache](https://github.com/ikselven/horde-apache) for a project that builds upon this image.
+See [ikselven/horde-apache](https://github.com/ikselven/horde-apache) for a project that builds upon this image and adds a webserver.
